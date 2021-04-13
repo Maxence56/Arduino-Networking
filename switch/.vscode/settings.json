@@ -1,0 +1,29 @@
+{
+    "python.linting.ignorePatterns": [
+        ".vscode/*.py",
+        "**/site-packages/**/*.py",
+        "compiler_extra_options.py"
+    ],
+    "cSpell.words": [
+        "and",
+        "ard",
+        "ardrf",
+        "arduinos",
+        "ccflags",
+        "cflags",
+        "clion",
+        "config",
+        "cxxflags",
+        "event",
+        "git",
+        "gitlab",
+        "handler",
+        "instance",
+        "instanciate",
+        "jnode",
+        "led",
+        "moodle",
+        "msg",
+        "myservo"
+    ]
+}

@@ -1,0 +1,12 @@
+cmake_minimum_required(VERSION 3.5)
+project(ard_net_root)
+
+# from https://stackoverflow.com/a/50545260 
+# this way cmake should pass the compiler flags to use C++11
+set (CMAKE_CXX_STANDARD 11)
+set (CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+add_subdirectory(ard-net-lib/ard-net/src)
+add_subdirectory(ard-net/student-lib/src)
+add_subdirectory(ard-net-native-tests)
+add_subdirectory(ard-net/samples)

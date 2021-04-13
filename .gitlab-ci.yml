@@ -1,0 +1,43 @@
+# Online Documentation at: https://docs.gitlab.com/ee/ci/yaml/README.htm
+image: rikorose/gcc-cmake
+#image: coenvl/googletest
+
+#variables:
+#  GIT_SUBMODULE_STRATEGY: recursive
+
+cache:
+  paths:
+  - debug/
+
+stages:
+  - prebuild-project
+  - build-project
+  - test-project
+
+
+setup-project-environment:
+  stage: prebuild-project
+  script:
+    - mkdir -p debug
+    - cd ..
+    - if cd ard-net-native-tests; then git pull; cd ..; else git clone https://gitlab.imt-atlantique.fr/sar-res-21/ard-net-native-tests ard-net-native-tests; fi
+    - if cd ard-net-lib; then git pull; cd ..; else git clone https://gitlab.imt-atlantique.fr/sar-res-21/ard-net-lib.git ard-net-lib; fi
+  only:
+    - master
+
+build-project-tests:
+  stage: build-project
+  script:
+    - cp root-CMakeLists.txt ../CMakeLists.txt
+    - cd debug
+    - cmake ../..
+    - make
+  only:
+    - master
+
+project-test:
+  stage: test-project
+  script:
+    - debug/ard-net-native-tests/ard_network_layer_two_test
+  only:
+    - master

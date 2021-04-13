@@ -1,0 +1,50 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "CMake Config Debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${env:HOME}/ard-net-dev/debug"
+            },
+            "command": "cmake",
+            "args": [
+                "-DCMAKE_BUILD_TYPE=Debug",
+                ".."
+            ],
+            "dependsOn": "Create Build Dir",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "Create Build Dir",
+            "type": "shell",
+            "command": "mkdir",
+            "args": ["-p", "~/ard-net-dev/debug"]
+        },
+        {
+            "label": "Make debug",
+            "type": "shell",
+            "options": {
+                "cwd": "${env:HOME}/ard-net-dev/debug"
+            },
+            "command": "make",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": "absolute",
+
+            },
+            "dependsOn": "CMake Config Debug",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        }
+    ]
+}
