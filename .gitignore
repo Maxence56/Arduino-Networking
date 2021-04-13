@@ -1,0 +1,62 @@
+# debug directory
+debug/
+
+.pio
+.pioenvs
+.piolibdeps
+# Note: git prevent excluding a file (with !) that is part of an already excluded directory
+!.vscode/settings.json
+# test for samples
+#!.vscode/launch.json 
+#!.vscode/tasks.json
+# End of test for samples
+# Still wondering if next line should be keept or not
+**/.vscode/
+
+
+ipch/
+
+# Created by https://www.gitignore.io/api/c++,test
+# Edit at https://www.gitignore.io/?templates=c++,test
+
+### C++ ###
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+*.ipch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+## I don't know what these are but I do not want them in git anyway!
+mmap_address.bin
+
+
+# Doxygen output direcotry
+generated-docs/
