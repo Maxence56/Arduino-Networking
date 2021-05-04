@@ -9,7 +9,7 @@
 
 
 // Set your group number (minus one) here (eg. 5 for group #6)
-uint8_t g_group_number  = YOUR_GROUP_NUMBER_MINUS_ONE; // Between 0 and 0x0E
+uint8_t g_group_number  = 3; // Between 0 and 0x0E
 
 
 // Framework initialisation
