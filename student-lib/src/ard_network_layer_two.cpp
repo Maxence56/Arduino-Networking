@@ -142,12 +142,58 @@ ArdNetworkLayerTwoAck::ArdNetworkLayerTwoAck(
 void ArdNetworkLayerTwoAck::sendRequest(PktBufPtr a_p, L2Addr a_l2_dst_addr) {
   debug_pr(ARD_F("Layer 2 Send, size: "), int(a_p->curr_size), ARD_F(", to "),
            a_l2_dst_addr.m_addr, ARD_F("\n"));
+// We build an object of type L2Message, which contains all the fields of
+  // the layer two header.
+  L2Message l2_msg(m_this_addr, a_l2_dst_addr, a_p->curr_size, m_send_seq_num,
+                   L2_TYP_DATA);
+
+  // We use the serialize method of the L2Message object to obtain its binary
+  // representation, including its payload, thanks to the a_p parameter
+  PktBufPtr l2_p = l2_msg.serialize(ard_move(a_p), m_mem_pool);
+
+  // We increment the sequence number counter.  So that it will have the
+  // correct value next time we need to send a packet.
+  ++m_send_seq_num;
+
+  // Before adding a packet to the transmission queue, we need to make sure
+  // that it is not full.  If it is, we print a message and drop the packet.
+  bool res = false;
+  if (m_queue.isFull()) {
+    info_pr(ARD_F("L2: dropping a frame because the tx queue is full\n"));
+    res = false;
+  } else {
+    res = true;
+    // If the queue is not full, we can add a packet.  Note that we have to
+    // use ard_move because we are relinquishing the ownership of the
+    // corresponding memory buffer ("we are passing the token").
+    m_queue.addElement(ard_move(l2_p));
+    // Finally, we cal checkQueue to start the transmission, if the packet we
+    // just added is the only one in the queue and if we are not waiting for
+    // a previous transmission to finish.
+    checkQueue();
+    m_timer_handler.startTimer(1000, &m_timer_func);
+  }
+  if (m_upper_layer) {
+    // m_upper_layer->dataHandlingDone(ard_move(a_p), res);
+  }
 }
 
 void ArdNetworkLayerTwoAck::checkQueue() {
+  if (!m_sending && !m_queue.isEmpty()) {
+    m_sending = true;
+    PktBufPtr l2_p = m_queue.removeElement();
+    // Store the last sequence number sent
+    m_last_seq_num_sent = getSeqNumFromBuffer(l2_p->data);
+    doSend(ard_move(l2_p));
+  }
 }
 
 void ArdNetworkLayerTwoAck::doSend(PktBufPtr l2_p) {
+  if (!(m_send_interface)) {
+    ard_error(ARD_F("Layer 2 sendRequest: lower layer is not set\n "));
+  }
+  L2Addr dst_addr = L2Message::getDstAddr(l2_p->data);
+  m_send_interface->sendRequest(ard_move(l2_p), dst_addr);
 }
 
 void ArdNetworkLayerTwoAck::dataHandlingDone(PktBufPtr l2_p, bool res) {
