@@ -35,9 +35,16 @@ build-project-tests:
   only:
     - master
 
-project-test:
+l2-tests-basic:
   stage: test-project
   script:
     - debug/ard-net-native-tests/ard_network_layer_two_test
+  only:
+    - master
+
+l2-tests-multinodes:
+  stage: test-project
+  script:
+    - debug/ard-net-native-tests/ard_network_layer_two_multinode_test
   only:
     - master
