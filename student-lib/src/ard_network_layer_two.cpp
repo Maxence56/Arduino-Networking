@@ -22,16 +22,21 @@ ArdNetworkLayerTwoThreeTxs::ArdNetworkLayerTwoThreeTxs(
       m_tx_count(0), m_last_seq_num_sent(0) {}
 
 void ArdNetworkLayerTwoThreeTxs::sendRequest(PktBufPtr a_p,
-                                             L2Addr a_l2_dst_addr) {
+                                             L2Addr a_l2_dst_addr)
+{
   debug_pr(ARD_F("Layer 2 Send, size: "), int(a_p->curr_size), ARD_F("\n"));
   // We build an object of type L2Message, which contains all the fields of
   // the layer two header.
   L2Message l2_msg(m_this_addr, a_l2_dst_addr, a_p->curr_size, m_send_seq_num,
                    L2_TYP_DATA);
 
-  // We use the serialize method of the L2Message object to obtain its binary
-  // representation, including its payload, thanks to the a_p parameter
-  PktBufPtr l2_p = l2_msg.serialize(ard_move(a_p), m_mem_pool);
+  // We use the serialize method of the L2Message object to build its binary
+  // representation, including its payload, pointed by the a_p parameter. The
+  // serialize method stores the packet buffer pointer in the m_pkt_buff
+  // attribute of the l2_msg object.  The method returns the unique pointer
+  // pointing to the payload. This way we can return it (pass the token) back to
+  // the upper layer (see below).
+  a_p = l2_msg.serialize(ard_move(a_p), m_mem_pool);
 
   // We increment the sequence number counter.  So that it will have the
   // correct value next time we need to send a packet.
@@ -40,24 +45,29 @@ void ArdNetworkLayerTwoThreeTxs::sendRequest(PktBufPtr a_p,
   // Before adding a packet to the transmission queue, we need to make sure
   // that it is not full.  If it is, we print a message and drop the packet.
   bool res = false;
-  if (m_queue.isFull()) {
+  if (m_queue.isFull())
+  {
     info_pr(ARD_F("L2: dropping a frame because the tx queue is full\n"));
     res = false;
-  } else {
+  }
+  else
+  {
     res = true;
     // If the queue is not full, we can add a packet.  Note that we have to
     // use ard_move because we are relinquishing the ownership of the
     // corresponding memory buffer ("we are passing the token").
-    m_queue.addElement(ard_move(l2_p));
+    m_queue.addElement(ard_move(l2_msg.m_pkt_buff));
     // Finally, we cal checkQueue to start the transmission, if the packet we
     // just added is the only one in the queue and if we are not waiting for
     // a previous transmission to finish.
     checkQueue();
   }
-  if (m_upper_layer) {
+  if (m_upper_layer)
+  {
     m_upper_layer->dataHandlingDone(ard_move(a_p), res);
   }
 }
+
 
 void ArdNetworkLayerTwoThreeTxs::checkQueue() {
   if (!m_sending && !m_queue.isEmpty()) {
