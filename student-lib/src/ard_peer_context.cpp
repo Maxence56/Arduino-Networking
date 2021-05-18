@@ -53,23 +53,6 @@ bool PeerContextPool::isAddInPool(nodeAdd a_address){
   return &(m_pool[i]);
 }
 
-// bool PeerContextPool::addItemInPool(PeerContext a_newContext){
-//   if (isFull()) return false;
-//   if (isAddInPool(a_newContext.m_address)){
-//       error_pr(ARD_F("Trying to add an already existing node in PeerContextPool\n"));
-//       return false;
-//   }
-//   // find an empty slot
-//   for (uint8_t i; i<MAX_NB_PEER; i++){
-//       if (m_pool[i].m_address == PeerContext::invalid_add){
-//           m_pool[i] = a_newContext;
-//           return true;
-//       }
-//   }
-//   error_pr(ARD_F("Noo room left in PeerContextPool\n"));
-//   return false; // should not append is pool is not full...
-// }
-
 
 bool PeerContextPool::isFull(){
   for (uint8_t i=0; i<MAX_NB_PEER; i++){
