@@ -214,6 +214,19 @@ void ArdNetworkLayerTwoAck::onDataReceived(PktBufPtr a_p, AnyAddr a_src_addr,
                                            LayerId a_l_id) {
   debug_pr(ARD_F("Layer 2 onDataReceived, size: "), int(a_p->curr_size),
            ARD_F("\n"));
+  if (a_p->curr_size < 4) {
+    info_pr(ARD_F("Layer 2 ignoring data frame, too small, size: "),
+            int(a_p->curr_size), ARD_F("\n"));
+    return;
+  }
+  L2Message l2_msg;
+  PktBufPtr payload_p = l2_msg.deSerialize(ard_move(a_p), m_mem_pool);
+
+  if (!(m_upper_layer)) {
+    ard_error(ARD_F("Layer 2 onDataReceived: north interface is not bound\n "));
+  }
+  m_upper_layer->onDataReceived(ard_move(payload_p), AnyAddr(l2_msg.m_src_add),
+                                m_l_id);
 }
 
 uint8_t ArdNetworkLayerTwoAck::getSeqNumFromBuffer(uint8_t *p) {
