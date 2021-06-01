@@ -1,13 +1,13 @@
 # Online Documentation at: https://docs.gitlab.com/ee/ci/yaml/README.htm
-image: rikorose/gcc-cmake
-#image: coenvl/googletest
+# image: rikorose/gcc-cmake
+image: coenvl/googletest
 
 #variables:
 #  GIT_SUBMODULE_STRATEGY: recursive
 
 cache:
   paths:
-  - debug/
+  - ../debug/
 
 stages:
   - prebuild-project
@@ -18,7 +18,6 @@ stages:
 setup-project-environment:
   stage: prebuild-project
   script:
-    - mkdir -p debug
     - cd ..
     - if cd ard-net-native-tests; then git pull; cd ..; else git clone https://gitlab.imt-atlantique.fr/sar-res-21/ard-net-native-tests ard-net-native-tests; fi
     - if cd ard-net-lib; then git pull; cd ..; else git clone https://gitlab.imt-atlantique.fr/sar-res-21/ard-net-lib.git ard-net-lib; fi
@@ -29,8 +28,11 @@ build-project-tests:
   stage: build-project
   script:
     - cp root-CMakeLists.txt ../CMakeLists.txt
+    - cd ..
+    - if [ -d debug ]; then rm -rf debug; fi
+    - mkdir -p debug
     - cd debug
-    - cmake ../..
+    - cmake ..
     - make
   only:
     - master
@@ -38,13 +40,20 @@ build-project-tests:
 l2-tests-basic:
   stage: test-project
   script:
-    - debug/ard-net-native-tests/ard_network_layer_two_test
+    - ../debug/ard-net-native-tests/ard_network_layer_two_test
   only:
     - master
 
 l2-tests-multinodes:
   stage: test-project
   script:
-    - debug/ard-net-native-tests/ard_network_layer_two_multinode_test
+    - ../debug/ard-net-native-tests/ard_network_layer_two_multinode_test
+  only:
+    - master
+
+l3-tests:
+  stage: test-project
+  script:
+    - ../debug/ard-net-native-tests/ard_network_layer_three_test
   only:
     - master

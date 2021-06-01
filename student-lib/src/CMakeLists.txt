@@ -3,9 +3,11 @@ project(ard_net_student_lib)
 
 set(ard_net_student_lib_sources
         ard_network_layer_two.cpp 
-        ard_network_layer_two_functor.cpp ard_network_layer_two_functor.h
-        #ard_peer_context.cpp
-        )
+        ard_network_layer_two_functor.cpp
+        ard_peer_context.cpp
+        ard_network_layer_three_message.cpp
+        ard_network_layer_three_routing.cpp
+        ard_network_layer_three.cpp)
 
 
 add_library(ard_net_student_lib STATIC ${ard_net_student_lib_sources})
