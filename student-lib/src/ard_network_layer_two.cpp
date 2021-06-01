@@ -227,6 +227,13 @@ void ArdNetworkLayerTwoAck::onDataReceived(PktBufPtr a_p, AnyAddr a_src_addr,
   }
   m_upper_layer->onDataReceived(ard_move(payload_p), AnyAddr(l2_msg.m_src_add),
                                 m_l_id);
+  L2Message ack_msg( m_this_addr, l2_msg.m_src_add, 0, m_send_seq_num, L2_TYP_ACK);
+  ArdUniquePtrMemPool<ArdPktBuffer> a_p1 = ack_msg.serialize(m_mem_pool);
+  if (!(m_send_interface)) {
+    ard_error(ARD_F("Layer 2 sendRequest: lower layer is not set\n "));
+  }
+  L2Addr dst_addr = l2_msg.m_src_add;
+  m_send_interface->sendRequest(ard_move(a_p1), dst_addr);
 }
 
 uint8_t ArdNetworkLayerTwoAck::getSeqNumFromBuffer(uint8_t *p) {
