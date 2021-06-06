@@ -24,10 +24,10 @@ L2Addr  g_l2_addr  = mapAddr<AppAddr, L2Addr>(g_app_addr, g_app_addr);
 // Layer 2:
 SendInterfaceImplementation<L2Addr, L1Addr> l2_send_policy(g_l2_addr);
 // Note: To activate the new version of layer2, swap the comments on the following lines
-ArdNetworkLayerTwoThreeTxs g_l2(&g_mem_pool, &g_sys_int, &g_event_manager,
-                                &l2_send_policy, g_l2_addr);
-// ArdNetworkLayerTwoAck g_l2(&g_mem_pool, &g_sys_int, &g_event_manager, 
-//                            &l2_send_policy, g_l2_addr);
+// ArdNetworkLayerTwoThreeTxs g_l2(&g_mem_pool, &g_sys_int, &g_event_manager,
+//                                &l2_send_policy, g_l2_addr);
+ ArdNetworkLayerTwoAck g_l2(&g_mem_pool, &g_sys_int, &g_event_manager, 
+                            &l2_send_policy, g_l2_addr);
 
 // Layer 1: RFM12
 ArdNetworkLayerOne g_l1(&g_mem_pool, &g_sys_int, &g_event_manager, L1Addr());
