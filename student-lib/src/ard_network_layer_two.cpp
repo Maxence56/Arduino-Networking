@@ -143,18 +143,21 @@ ArdNetworkLayerTwoAck::ArdNetworkLayerTwoAck(
     L2Addr a_this_addr)
     : ArdNetworkLayer(a_mem_pool, a_ard_sys_int, a_event_manager,
                       a_send_interface, a_this_addr),
-      m_send_seq_num(0), m_last_seq_num_processed(0xFF), m_queue(),
+      m_queue(),
+      m_contexts(),
       m_sending(false), m_tx_count(0),
-      m_last_seq_num_sent(0),
       m_timer_handler(a_event_manager, a_ard_sys_int),
       m_timer_func(*this, &ArdNetworkLayerTwoAck::doSend, a_mem_pool) {}
 
 void ArdNetworkLayerTwoAck::sendRequest(PktBufPtr a_p, L2Addr a_l2_dst_addr) {
   debug_pr(ARD_F("Layer 2 Send, size: "), int(a_p->curr_size), ARD_F(", to "),
            a_l2_dst_addr.m_addr, ARD_F("\n"));
+if (m_contexts.isAddInPool(a_l2_dst_addr.m_addr)==false){
+  m_contexts.getNewContextForAdd(a_l2_dst_addr.m_addr);
+}
 // We build an object of type L2Message, which contains all the fields of
   // the layer two header.
-  L2Message l2_msg(m_this_addr, a_l2_dst_addr, a_p->curr_size, m_send_seq_num,
+  L2Message l2_msg(m_this_addr, a_l2_dst_addr, a_p->curr_size, m_contexts.retrieveContextByAdd(a_l2_dst_addr.m_addr)->m_send_seq_num,
                    L2_TYP_DATA);
 
   // We use the serialize method of the L2Message object to obtain its binary
@@ -162,7 +165,7 @@ void ArdNetworkLayerTwoAck::sendRequest(PktBufPtr a_p, L2Addr a_l2_dst_addr) {
  a_p = l2_msg.serialize(ard_move(a_p), m_mem_pool);
   // We increment the sequence number counter.  So that it will have the
   // correct value next time we need to send a packet.
-  ++m_send_seq_num;
+  ++m_contexts.retrieveContextByAdd(a_l2_dst_addr.m_addr)->m_send_seq_num;
 
   // Before adding a packet to the transmission queue, we need to make sure
   // that it is not full.  If it is, we print a message and drop the packet.
@@ -192,7 +195,7 @@ void ArdNetworkLayerTwoAck::checkQueue() {
     m_sending = true;
     PktBufPtr l2_p = m_queue.removeElement();
     // Store the last sequence number sent
-    m_last_seq_num_sent = getSeqNumFromBuffer(l2_p->data);
+    // m_contexts.retrieveContextByAdd()->m_last_seq_num_sent = getSeqNumFromBuffer(l2_p->data);
     doSend(ard_move(l2_p));
   }
 }
@@ -227,7 +230,7 @@ void ArdNetworkLayerTwoAck::onDataReceived(PktBufPtr a_p, AnyAddr a_src_addr,
   }
   m_upper_layer->onDataReceived(ard_move(payload_p), AnyAddr(l2_msg.m_src_add),
                                 m_l_id);
-  L2Message ack_msg( m_this_addr, l2_msg.m_src_add, 0, m_send_seq_num, L2_TYP_ACK);
+  L2Message ack_msg( m_this_addr, l2_msg.m_src_add, 0, m_contexts.retrieveContextByAdd(l2_msg.m_src_add.m_addr)->m_send_seq_num, L2_TYP_ACK);
   ArdUniquePtrMemPool<ArdPktBuffer> a_p1 = ack_msg.serialize(m_mem_pool);
   if (!(m_send_interface)) {
     ard_error(ARD_F("Layer 2 sendRequest: lower layer is not set\n "));
