@@ -10,7 +10,6 @@
 #include "ard_network_layer_two_functor.h"
 #include "ard_pkt_buffer.h"
 #include "ard_sys_interface.h"
-#include "ard_peer_context.cpp"
 #include "ard_peer_context.h"
 
 /** \addtogroup most_important 
