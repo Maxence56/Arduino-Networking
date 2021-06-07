@@ -195,7 +195,7 @@ void ArdNetworkLayerTwoAck::checkQueue() {
     m_sending = true;
     PktBufPtr l2_p = m_queue.removeElement();
     // Store the last sequence number sent
-    // m_contexts.retrieveContextByAdd()->m_last_seq_num_sent = getSeqNumFromBuffer(l2_p->data);
+    m_contexts.retrieveContextByAdd(L2Message::getDstAddr(l2_p->data).m_addr)->m_last_seq_num_sent = getSeqNumFromBuffer(l2_p->data);
     doSend(ard_move(l2_p));
   }
 }
